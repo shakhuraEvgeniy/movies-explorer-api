@@ -22,13 +22,18 @@ const updateUser = async (req, res, next) => {
   try {
     const { _id } = req.user;
     const { email, name } = req.body;
-    const { newEmail, newName } = await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       _id,
       { email, name },
       { new: true, runValidators: true },
     ).orFail(new NotFoundError('Пользователь с указанным id не существует'));
-    res.send({ newEmail, newName });
+    res.send(user);
   } catch (e) {
+    if (e.code === 11000) {
+      const err = new ConflictError('Пользователь с данным email уже зарегистрирован');
+      next(err);
+      return;
+    }
     next(e);
   }
 };
@@ -42,7 +47,11 @@ const createUser = async (req, res, next) => {
       email,
       password: hash,
     });
-    res.send(user);
+    res.send({
+      name: user.name,
+      email: user.email,
+      _id: user._id,
+    });
   } catch (e) {
     if (e.code === 11000) {
       const err = new ConflictError('Пользователь с данным email уже зарегистрирован');
@@ -61,9 +70,9 @@ const createUser = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = User.find({ email })
+    const user = await User.findOne({ email })
       .select('+password')
-      .orFail(new Error('noFoundEmail'));
+      .orFail(new UnauthorizedError('Задан некорректный email или пароль.'));
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
       throw new UnauthorizedError('Задан некорректный email или пароль.');
@@ -74,7 +83,7 @@ const login = async (req, res, next) => {
       { expiresIn: '7d' },
     );
     res
-      .cookies('jwt', token, {
+      .cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
       })
@@ -90,7 +99,7 @@ const login = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('JWT').send({ message: 'Вы вышли из системы' });
+    res.clearCookie('jwt').send({ message: 'Вы вышли из системы' });
   } catch (e) {
     next(e);
   }
