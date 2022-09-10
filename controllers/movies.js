@@ -61,11 +61,10 @@ const deleteMovie = async (req, res, next) => {
       throw new ForbiddenError('Недостаточно прав для удаления.');
     }
     await movie.remove();
-    // const movieDelete = await Movies.findOneAndRemove({ _id: req.params.id }).orFail(new NotFoundError('Видео с указанным _id не найдена.'));
     res.send(movie);
   } catch (e) {
     if (e.name === 'CastError') {
-      const err = new BedRequestError('Видео с указанным _id не найдена.');
+      const err = new BedRequestError('Видео с указанным _id не найдено.');
       next(err);
       return;
     }

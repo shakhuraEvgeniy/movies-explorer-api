@@ -21,7 +21,7 @@ const validateMovieBody = celebrate({
     director: Joi.string().required().messages({
       'any.required': 'Поле "director" должно быть заполнено',
     }),
-    duration: Joi.string().required().messages({
+    duration: Joi.number().required().messages({
       'any.required': 'Поле "duration" должно быть заполнено',
     }),
     year: Joi.string().required().messages({
@@ -57,16 +57,12 @@ const validateMovieBody = celebrate({
       .messages({
         'any.required': 'Поле "thumbnail" должно быть заполнено',
       }),
-    owner: Joi.string().required().custom((value, helpers) => {
+    movieId: Joi.string().required().custom((value, helpers) => {
       if (ObjectId.isValid(value)) {
         return value;
       }
-      return helpers.message('Невалидный id пользователя');
-    })
-      .messages({
-        'any.required': 'Поле "owner" должно быть заполнено',
-      }),
-    movieId: Joi.string().required().messages({
+      return helpers.message('Невалидный id видео');
+    }).messages({
       'any.required': 'Поле "movieId" должно быть заполнено',
     }),
     nameRU: Joi.string().required().messages({

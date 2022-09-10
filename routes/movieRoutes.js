@@ -5,7 +5,7 @@ const { validateObjectId, validateMovieBody } = require('../middlewares/validati
 const movieRouters = express.Router();
 
 movieRouters.get('/', getMovies);
-movieRouters.post('/', validateMovieBody, express.json(), createMovie);
+movieRouters.post('/', express.json(), validateMovieBody, createMovie);
 movieRouters.delete('/:id', validateObjectId, deleteMovie);
 
 module.exports = movieRouters;
