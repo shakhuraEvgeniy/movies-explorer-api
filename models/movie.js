@@ -1,73 +1,90 @@
 const mongoose = require('mongoose');
 const valid = require('validator');
+const {
+  REQUIRED_COUNTRY,
+  REQUIRED_DIRECTOR,
+  REQUIRED_DURATION,
+  REQUIRED_YEAR,
+  REQUIRED_DESCRIPTION,
+  REQUIRED_IMAGE,
+  ERROR_URL_IMAGE,
+  ERROR_URL_TRAILER,
+  REQUIRED_TRAILER,
+  REQUIRED_THUMBNAIL,
+  ERROR_URL_THUMBNAIL,
+  REQUIRED_MOVIEID,
+  REQUIRED_NAMERU,
+  REQUIRED_NAMEEN,
+  REQUIRED_OWNER,
+} = require('../utils/constants');
 
 const movieShema = mongoose.Schema({
   country: {
     type: String,
-    required: [true, 'Поле "country" должно быть заплонено'],
+    required: [true, REQUIRED_COUNTRY],
   },
   director: {
     type: String,
-    required: [true, 'Поле "director" должно быть заплонено'],
+    required: [true, REQUIRED_DIRECTOR],
   },
   duration: {
     type: Number,
-    required: [true, 'Поле "duration" должно быть заплонено'],
+    required: [true, REQUIRED_DURATION],
   },
   year: {
     type: String,
-    required: [true, 'Поле "year" должно быть заплонено'],
+    required: [true, REQUIRED_YEAR],
   },
   description: {
     type: String,
-    required: [true, 'Поле "description" должно быть заплонено'],
+    required: [true, REQUIRED_DESCRIPTION],
   },
   image: {
     type: String,
-    required: [true, 'Поле "image" должно быть заплонено'],
+    required: [true, REQUIRED_IMAGE],
     validate: {
       validator(v) {
         return (valid.isURL(v));
       },
-      message: 'Ошибка в url постера к фильму',
+      message: ERROR_URL_IMAGE,
     },
   },
   trailerLink: {
     type: String,
-    required: [true, 'Поле "trailerLink" должно быть заплонено'],
+    required: [true, REQUIRED_TRAILER],
     validate: {
       validator(v) {
         return (valid.isURL(v));
       },
-      message: 'Ошибка в url трейлера фильма',
+      message: ERROR_URL_TRAILER,
     },
   },
   thumbnail: {
     type: String,
-    required: [true, 'Поле "thumbnail" должно быть заплонено'],
+    required: [true, REQUIRED_THUMBNAIL],
     validate: {
       validator(v) {
         return (valid.isURL(v));
       },
-      message: 'Ошибка в url миниатюрного изображения постера к фильму',
+      message: ERROR_URL_THUMBNAIL,
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: [true, 'Поле "owner" должно быть заплонено'],
+    required: [true, REQUIRED_OWNER],
   },
   movieId: {
-    type: String,
-    required: [true, 'Поле "movieId" должно быть заплонено'],
+    type: Number,
+    required: [true, REQUIRED_MOVIEID],
   },
   nameRU: {
     type: String,
-    required: [true, 'Поле "nameRU" должно быть заплонено'],
+    required: [true, REQUIRED_NAMERU],
   },
   nameEN: {
     type: String,
-    required: [true, 'Поле "nameEN" должно быть заплонено'],
+    required: [true, REQUIRED_NAMEEN],
   },
 }, { versionKey: false });
 

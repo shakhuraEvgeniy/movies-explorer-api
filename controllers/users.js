@@ -5,13 +5,19 @@ const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
 const BedRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const {
+  NOT_FOUND_USER,
+  NOT_UNIQUE_EMAIL,
+  ERROR_DATA_USER_CREATED,
+  ERROR_EMAIL_OR_PASSWORD,
+} = require('../utils/constants');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUser = async (req, res, next) => {
   try {
     const { _id } = req.user;
-    const { email, name } = await User.findById(_id).orFail(new NotFoundError('Пользователь с указанным id не существует'));
+    const { email, name } = await User.findById(_id).orFail(new NotFoundError(NOT_FOUND_USER));
     res.send({ email, name });
   } catch (e) {
     next(e);
@@ -26,11 +32,11 @@ const updateUser = async (req, res, next) => {
       _id,
       { email, name },
       { new: true, runValidators: true },
-    ).orFail(new NotFoundError('Пользователь с указанным id не существует'));
+    ).orFail(new NotFoundError(NOT_FOUND_USER));
     res.send(user);
   } catch (e) {
     if (e.code === 11000) {
-      const err = new ConflictError('Пользователь с данным email уже зарегистрирован');
+      const err = new ConflictError(NOT_UNIQUE_EMAIL);
       next(err);
       return;
     }
@@ -54,12 +60,12 @@ const createUser = async (req, res, next) => {
     });
   } catch (e) {
     if (e.code === 11000) {
-      const err = new ConflictError('Пользователь с данным email уже зарегистрирован');
+      const err = new ConflictError(NOT_UNIQUE_EMAIL);
       next(err);
       return;
     }
     if (e.name === 'ValidationError') {
-      const err = new BedRequestError('Переданы некорректные данные при создании пользователя');
+      const err = new BedRequestError(ERROR_DATA_USER_CREATED);
       next(err);
       return;
     }
@@ -72,10 +78,10 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email })
       .select('+password')
-      .orFail(new UnauthorizedError('Задан некорректный email или пароль.'));
+      .orFail(new UnauthorizedError(ERROR_EMAIL_OR_PASSWORD));
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
-      throw new UnauthorizedError('Задан некорректный email или пароль.');
+      throw new UnauthorizedError(ERROR_EMAIL_OR_PASSWORD);
     }
     const token = jwt.sign(
       { _id: user._id },
@@ -90,7 +96,7 @@ const login = async (req, res, next) => {
       .send({ _id: user._id });
   } catch (e) {
     if (e.name === 'noFoundEmail') {
-      next(new UnauthorizedError('Задан некорректный email или пароль.'));
+      next(new UnauthorizedError(ERROR_EMAIL_OR_PASSWORD));
       return;
     }
     next(e);

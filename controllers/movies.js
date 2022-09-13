@@ -2,6 +2,7 @@ const Movies = require('../models/movie');
 const BedRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
+const { ERROR_DATA_VIDEO_CREATED, ERROR_ACCESS_REMOVE, NOT_FOUND_MOVIE } = require('../utils/constants');
 
 const getMovies = async (req, res, next) => {
   try {
@@ -46,7 +47,7 @@ const createMovie = async (req, res, next) => {
     res.send(movie);
   } catch (e) {
     if (e.name === 'ValidationError') {
-      const err = new BedRequestError('Переданы некорректные данные при сохранеии видео');
+      const err = new BedRequestError(ERROR_DATA_VIDEO_CREATED);
       next(err);
       return;
     }
@@ -58,13 +59,13 @@ const deleteMovie = async (req, res, next) => {
   try {
     const movie = await Movies.findOne({ _id: req.params.id }).orFail(new NotFoundError('Видео с указанным _id не найдена.'));
     if (String(movie.owner._id) !== req.user._id) {
-      throw new ForbiddenError('Недостаточно прав для удаления.');
+      throw new ForbiddenError(ERROR_ACCESS_REMOVE);
     }
     await movie.remove();
     res.send(movie);
   } catch (e) {
     if (e.name === 'CastError') {
-      const err = new BedRequestError('Видео с указанным _id не найдено.');
+      const err = new BedRequestError(NOT_FOUND_MOVIE);
       next(err);
       return;
     }
