@@ -30,6 +30,7 @@ const REQUIRED_NAME = 'Поле "name" должно быть заплонено'
 const MIN_LENGTH_NAME = 'Минимальная длина поля "name" - 2 символа';
 const MAX_LENGTH_NAME = 'Максимальная длина поля "name" - 30 символов';
 const NOT_FOUND_PAGE = 'Запрошена несуществующая страница.';
+const EXIT_SYSTEM = 'Вы вышли из системы';
 
 module.exports = {
   ERROR_DATA_VIDEO_CREATED,
@@ -64,4 +65,5 @@ module.exports = {
   MIN_LENGTH_NAME,
   MAX_LENGTH_NAME,
   NOT_FOUND_PAGE,
+  EXIT_SYSTEM,
 };

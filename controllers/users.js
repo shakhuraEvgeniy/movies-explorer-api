@@ -10,6 +10,7 @@ const {
   NOT_UNIQUE_EMAIL,
   ERROR_DATA_USER_CREATED,
   ERROR_EMAIL_OR_PASSWORD,
+  EXIT_SYSTEM,
 } = require('../utils/constants');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -105,7 +106,7 @@ const login = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie('jwt').send({ message: 'Вы вышли из системы' });
+    res.clearCookie('jwt').send({ message: EXIT_SYSTEM });
   } catch (e) {
     next(e);
   }

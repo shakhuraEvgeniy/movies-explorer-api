@@ -57,7 +57,8 @@ const createMovie = async (req, res, next) => {
 
 const deleteMovie = async (req, res, next) => {
   try {
-    const movie = await Movies.findOne({ _id: req.params.id }).orFail(new NotFoundError('Видео с указанным _id не найдена.'));
+    const movie = await Movies.findOne({ _id: req.params.id })
+      .orFail(new NotFoundError(NOT_FOUND_MOVIE));
     if (String(movie.owner._id) !== req.user._id) {
       throw new ForbiddenError(ERROR_ACCESS_REMOVE);
     }
